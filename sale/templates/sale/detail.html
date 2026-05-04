@@ -1,0 +1,78 @@
+{% extends 'sale/base.html' %}
+{% load static %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.detail-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* IMAGE */
+.detail-image {
+    flex: 1;
+}
+
+.detail-image img {
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* INFO */
+.detail-info {
+    flex: 1;
+}
+
+.price {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: black;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .detail-container {
+        flex-direction: column;
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-container">
+
+    <div class="detail-image">
+        <img src="{{ product.image.url }}">
+    </div>
+
+    <div class="detail-info">
+        <h1>{{ product.name }}</h1>
+        <p class="price">₦{{ product.price }}</p>
+
+        <p>{{ product.description }}</p>
+
+        <a href="#" class="btn">Buy Now</a>
+    </div>
+
+</div>
+
+{% endblock %}
