@@ -38,12 +38,12 @@ def logout_view(request):
     return redirect('login')
 
 def home(request):
-    featured_product = Product.objects.filter(featured=True).order_by('-created_at')[:10]
+    featured_products = Product.objects.filter(featured=True).order_by('-created_at')[:10]
     feedbacks = Feedback.objects.all().order_by('-created_at')[:7]
     form = FeedbackForm()
 
     return render(request, "sale/home.html", {
-        "featured_product": featured_product,
+        "featured_products": featured_products,
         "feedbacks": feedbacks,
         "form": form
     })
