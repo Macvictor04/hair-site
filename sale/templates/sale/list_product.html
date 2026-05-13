@@ -1,185 +1,70 @@
 {% extends 'sale/base.html' %}
-{% load static %}
-
-{% block title %}Products{% endblock %}
-
-{% block extra_css %}
-<style>
-
-/* SECTION */
-.section {
-    padding: 30px 20px;
-    max-width: 1100px;
-    margin: auto;
-}
-
-/* SEARCH + FILTER BAR */
-.top-bar {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.top-bar form {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-input, select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-/* BUTTON */
-button {
-    padding: 10px 15px;
-    background: black;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* FLEX PRODUCT LIST */
-.product-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-}
-
-/* CARD */
-.card {
-    flex: 1 1 220px;
-    max-width: 260px;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.card-body {
-    padding: 10px;
-}
-
-.price {
-    font-weight: bold;
-}
-
-.btn {
-    display: block;
-    text-align: center;
-    padding: 8px;
-    background: black;
-    color: white;
-    text-decoration: none;
-    margin-top: 8px;
-    border-radius: 6px;
-}
-
-/* PAGINATION */
-.pagination {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.pagination a {
-    padding: 8px 12px;
-    margin: 0 5px;
-    background: #eee;
-    border-radius: 5px;
-    text-decoration: none;
-    color: black;
-}
-
-.pagination .active {
-    background: black;
-    color: white;
-}
-
-</style>
-{% endblock %}
 
 {% block content %}
+<div class="container">
+    <!-- 1. Search & Filter Header -->
+    <header style="padding: 40px 0; text-align: center;">
+        <h1 style="font-family: 'Playfair Display'; font-size: 2.2rem; text-transform: uppercase; margin-bottom: 20px;">
+            {% if query %} Results for "{{ query }}" {% else %} All Collections {% endif %}
+        </h1>
 
-<div class="section">
-
-    <h2 style="text-align:center;">Products</h2>
-
-    <!-- SEARCH + CATEGORY -->
-    <div class="top-bar">
-
-        <form method="GET">
-
-            <input type="text" name="q" placeholder="Search products..." value="{{ query }}">
-
-            <select name="category">
-                <option value="">All Categories</option>
-
-                {% for cat in categories %}
-                    <option value="{{ cat.id }}"
-                        {% if category_id == cat.id|stringformat:"s" %}selected{% endif %}>
-                        {{ cat.name }}
-                    </option>
-                {% endfor %}
-            </select>
-
-            <button type="submit">Search</button>
-
+        <!-- Search Bar -->
+        <form method="GET" action="{% url 'products' %}" style="margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
+            <input type="text" name="q" placeholder="Search hair type..." value="{{ query|default:'' }}" 
+                   style="background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px 15px; width: 300px;">
+            <button type="submit" class="cta-button" style="border: none; cursor: pointer;">Search</button>
         </form>
 
-    </div>
-
-    <!-- PRODUCTS -->
-    <div class="product-list">
-
-        {% for product in product %}
-        <div class="card">
-
-            <img src="{{ product.image.url }}">
-
-            <div class="card-body">
-                <h4>{{ product.name }}</h4>
-                <p class="price">₦{{ product.price }}</p>
-
-                <a href="{% url 'product_detail' product.id %}" class="btn">
-                    View
-                </a>
-            </div>
-
+        <!-- Category Pills -->
+        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 40px;">
+            <a href="{% url 'products' %}" 
+               style="text-decoration: none; color: {% if not request.GET.category %}var(--gold){% else %}#888{% endif %}; font-size: 0.8rem; text-transform: uppercase;">All</a>
+            {% for cat in category %}
+            <a href="?category={{ cat.id }}" 
+               style="text-decoration: none; color: {% if request.GET.category == cat.id|stringformat:'i' %}var(--gold){% else %}#888{% endif %}; font-size: 0.8rem; text-transform: uppercase;">
+               {{ cat.name }}
+            </a>
+            {% endfor %}
         </div>
-        {% empty %}
-            <p>No products found.</p>
-        {% endfor %}
+    </header>
 
-    </div>
+    <!-- 2. The Product Grid (Constrained) -->
+    <section style="padding-bottom: 60px;">
+        <div class="product-grid">
+            {% for p in product %}
+            <div class="product-card" style="background: var(--gray); padding: 15px; border: 1px solid #222;">
+                <div style="width: 100%; height: 350px; overflow: hidden; margin-bottom: 15px;">
+                    <img src="{{ p.image.url }}" alt="{{ p.name }}" 
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h3 style="font-size: 1rem; font-weight: 400; margin-bottom: 5px;">{{ p.name }}</h3>
+                <p class="price" style="color: var(--gold); font-weight: 600;">${{ p.price }}</p>
+                <a href="#" style="display: block; margin-top: 15px; text-align: center; border: 1px solid #444; color: white; text-decoration: none; font-size: 0.7rem; padding: 8px; text-transform: uppercase;">View Product</a>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 80px 0;">
+                <p>No products found matching your criteria.</p>
+                <a href="{% url 'products' %}" style="color: var(--gold);">Clear all filters</a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
 
-    <!-- PAGINATION -->
-    <div class="pagination">
-
+    <!-- 3. Pagination -->
+    {% if product.has_other_pages %}
+    <nav style="display: flex; justify-content: center; gap: 10px; padding-bottom: 80px;">
         {% if product.has_previous %}
-            <a href="?page={{ product.previous_page_number }}&q={{ query }}&category={{ category_id }}">Prev</a>
+            <a href="?page={{ product.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+               style="color: var(--gold); text-decoration: none; padding: 5px 10px; border: 1px solid #333;">&laquo;</a>
         {% endif %}
 
-        <span class="active">
-            Page {{ product.number }} of {{ product.paginator.num_pages }}
-        </span>
+        <span style="padding: 5px 10px; color: #888;">Page {{ product.number }} of {{ product.paginator.num_pages }}</span>
 
         {% if product.has_next %}
-            <a href="?page={{ product.next_page_number }}&q={{ query }}&category={{ category_id }}">Next</a>
+            <a href="?page={{ product.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+               style="color: var(--gold); text-decoration: none; padding: 5px 10px; border: 1px solid #333;">&raquo;</a>
         {% endif %}
-
-    </div>
-
+    </nav>
+    {% endif %}
 </div>
-
-{% endblock %}
+{% endblock content %}

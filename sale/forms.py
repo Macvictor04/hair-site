@@ -20,3 +20,7 @@ class FeedbackForm(ModelForm):
     class Meta:
         model = Feedback
         fields = ['rating', 'message']
+        widgets = {
+            'rating': forms.NumberInput(attrs={'class': 'form-input', 'placeholder': 'Rating (1-5)'}),
+            'message': forms.Textarea(attrs={'class': 'form-input', 'placeholder': 'Write your review...', 'rows': 3}),
+        }

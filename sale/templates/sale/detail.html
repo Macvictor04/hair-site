@@ -1,78 +1,85 @@
 {% extends 'sale/base.html' %}
-{% load static %}
-
-{% block title %}Product Detail{% endblock %}
-
-{% block extra_css %}
-<style>
-
-.detail-container {
-    max-width: 900px;
-    margin: auto;
-    padding: 40px 20px;
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-/* IMAGE */
-.detail-image {
-    flex: 1;
-}
-
-.detail-image img {
-    width: 100%;
-    border-radius: 12px;
-}
-
-/* INFO */
-.detail-info {
-    flex: 1;
-}
-
-.price {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 10px 0;
-}
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: black;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    margin-top: 15px;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .detail-container {
-        flex-direction: column;
-    }
-}
-
-</style>
-{% endblock %}
 
 {% block content %}
-
-<div class="detail-container">
-
-    <div class="detail-image">
-        <img src="{{ product.image.url }}">
+<div class="details-container">
+    <!-- Image Side -->
+    <div class="image-gallery">
+        <!-- Main Product Image from Django -->
+        <img src="{{ product.image.url }}" class="main-img" id="mainImage" alt="{{ product.name }}">
+        
+        <div class="thumbnails">
+            <!-- Main image thumbnail -->
+            <img src="{{ product.image.url }}" class="thumb" onclick="updateImage('{{ product.image.url }}')">
+            
+            <!-- Logic for additional images if you have a Gallery model later -->
+            {% if product.image_2 %}
+                <img src="{{ product.image_2.url }}" class="thumb" onclick="updateImage('{{ product.image_2.url }}')">
+            {% endif %}
+        </div>
     </div>
 
-    <div class="detail-info">
+    <!-- Content Side -->
+    <div class="product-info">
         <h1>{{ product.name }}</h1>
-        <p class="price">₦{{ product.price }}</p>
+        <p class="info-price">${{ product.price }}</p>
+        
+        <form method="POST" action="#">
+            {% csrf_token %}
+            <label class="option-label">Select Length</label>
+            <select class="selector" name="length">
+                <option>18 Inches</option>
+                <option>22 Inches</option>
+                <option>26 Inches (+ $40)</option>
+            </select>
 
-        <p>{{ product.description }}</p>
+            <label class="option-label">Lace Type</label>
+            <select class="selector" name="lace">
+                <option>HD Lace (Seamless)</option>
+                <option>Transparent Lace</option>
+            </select>
 
-        <a href="#" class="btn">Buy Now</a>
+            <button type="submit" class="add-btn">Add to Cart</button>
+        </form>
+
+        <div class="desc">
+            <h4 style="color: var(--gold); margin-bottom: 10px; text-transform: uppercase; font-size: 0.8rem;">Product Description</h4>
+            <p>{{ product.description }}</p>
+        </div>
     </div>
-
 </div>
 
-{% endblock %}
+<!-- Simple Script to handle thumbnail switching -->
+<script>
+    function updateImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+</script>
+
+<style>
+    /* Styling specific to this page that isn't in base.html */
+    .details-container { display: flex; flex-wrap: wrap; padding: 60px 5%; gap: 50px; max-width: 1200px; margin: 0 auto; }
+    
+    .image-gallery { flex: 1 1 450px; }
+    .main-img { width: 100%; height: 600px; object-fit: cover; background: var(--gray); margin-bottom: 15px; border: 1px solid #222; }
+    .thumbnails { display: flex; gap: 10px; }
+    .thumb { width: 80px; height: 80px; object-fit: cover; cursor: pointer; opacity: 0.6; transition: 0.3s; border: 1px solid transparent; }
+    .thumb:hover { opacity: 1; border: 1px solid var(--gold); }
+
+    .product-info { flex: 1 1 400px; }
+    .product-info h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 10px; }
+    .info-price { font-size: 1.5rem; color: var(--gold); font-weight: 600; margin-bottom: 25px; }
+    
+    .option-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 10px; display: block; }
+    .selector { width: 100%; padding: 12px; background: var(--gray); border: 1px solid #333; color: white; margin-bottom: 25px; outline: none; font-family: inherit; }
+    
+    .add-btn { width: 100%; padding: 18px; background: var(--gold); color: white; border: none; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
+    .add-btn:hover { background: #ad8a45; }
+
+    .desc { margin-top: 40px; border-top: 1px solid #222; padding-top: 20px; line-height: 1.8; color: #ccc; }
+    
+    @media (max-width: 768px) {
+        .main-img { height: 400px; }
+        .details-container { padding-top: 20px; }
+    }
+</style>
+{% endblock content %}

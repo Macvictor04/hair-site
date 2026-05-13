@@ -1,288 +1,52 @@
 {% extends 'sale/base.html' %}
-{% load static %}
-
-{% block title %}Luxury Hair Collection{% endblock %}
-
-{% block extra_css %}
-
-<style>
-
-:root{
-    --gold:#c5a059;
-    --dark:#121212;
-    --light:#f4f4f4;
-    --gray:#1f1f1f;
-}
-
-/* =========================
-   MAIN SECTION
-========================= */
-
-.section{
-    padding:60px 5%;
-    background:var(--dark);
-    min-height:100vh;
-    color:var(--light);
-}
-
-/* =========================
-   HERO TITLE
-========================= */
-
-.page-title{
-    text-align:center;
-    margin-bottom:60px;
-}
-
-.page-title h2{
-    font-size:3rem;
-    font-family:'Playfair Display', serif;
-    margin-bottom:10px;
-}
-
-.page-title p{
-    color:#aaa;
-    letter-spacing:1px;
-}
-
-/* =========================
-   FEATURED PRODUCTS
-========================= */
-
-.product-list{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:30px;
-    margin-bottom:80px;
-}
-
-.card{
-    flex:1 1 280px;
-    max-width:340px;
-    background:var(--gray);
-    border-radius:16px;
-    overflow:hidden;
-    transition:0.4s ease;
-    border:1px solid transparent;
-}
-
-.card:hover{
-    transform:translateY(-10px);
-    border-color:var(--gold);
-}
-
-.card-image img{
-    width:100%;
-    height:320px;
-    object-fit:cover;
-    transition:0.5s ease;
-}
-
-.card:hover img{
-    transform:scale(1.08);
-}
-
-.card-body{
-    padding:20px;
-}
-
-.card-body h4{
-    font-size:1.2rem;
-    margin-bottom:8px;
-}
-
-.card-body p{
-    color:#aaa;
-    font-size:0.95rem;
-}
-
-.price{
-    color:var(--gold);
-    font-size:1.1rem;
-    font-weight:600;
-    margin-top:10px;
-}
-
-.btn-group{
-    display:flex;
-    gap:10px;
-    margin-top:15px;
-}
-
-.btn{
-    flex:1;
-    text-align:center;
-    padding:12px;
-    border-radius:8px;
-    text-decoration:none;
-    font-size:0.9rem;
-}
-
-.view-btn{
-    background:white;
-    color:black;
-}
-
-.cart-btn{
-    background:var(--gold);
-    color:white;
-}
-
-/* =========================
-   FEEDBACK SECTION
-========================= */
-
-.feedback-section{
-    margin-top:60px;
-}
-
-.feedback-title{
-    text-align:center;
-    margin-bottom:30px;
-}
-
-.feedback-title h3{
-    font-size:2rem;
-}
-
-.feedback-box{
-    background:var(--gray);
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:15px;
-}
-
-.feedback-box small{
-    color:#aaa;
-}
-
-.feedback-box p{
-    margin-top:10px;
-}
-
-/* FORM */
-
-.feedback-form{
-    margin-top:40px;
-    background:var(--gray);
-    padding:20px;
-    border-radius:12px;
-}
-
-.feedback-form input,
-.feedback-form textarea{
-    width:100%;
-    padding:12px;
-    margin-bottom:10px;
-    border:none;
-    border-radius:8px;
-    background:#2a2a2a;
-    color:white;
-}
-
-.feedback-form button{
-    padding:12px 20px;
-    border:none;
-    background:var(--gold);
-    color:white;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media(max-width:768px){
-    .page-title h2{
-        font-size:2.2rem;
-    }
-
-    .btn-group{
-        flex-direction:column;
-    }
-}
-
-</style>
-
-{% endblock %}
 
 {% block content %}
+    <!-- Hero Banner (Only on Home Page) -->
+    <header style="height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1522337360788-8b13df772ce5?auto=format&fit=crop&w=1920&q=80') center/cover;">
+        <h1 style="font-family: 'Playfair Display'; font-size: 3rem;">Crown Your Beauty</h1>
+        <a href="{% url 'products' %}" class="cta-button" style="margin-top: 20px;">Shop Collection</a>
+    </header>
 
-<section class="section">
-
-    <!-- HERO -->
-    <div class="page-title">
-        <h2>Luxury Hair Collection</h2>
-        <p>Premium quality hair products curated for elegance and beauty</p>
-    </div>
-
-    <!-- FEATURED PRODUCTS -->
-    <div class="product-list">
-
-        {% for p in featured_product %}
-        <div class="card">
-
-            <div class="card-image">
-                <img src="{{ p.image.url }}" alt="{{ p.name }}">
+    <!-- Featured Products -->
+    <section style="padding: 60px 8%;">
+        <h2 class="section-title">Featured Drop</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px;">
+            {% for product in featured_products %}
+            <div style="background: var(--gray); padding: 15px;">
+                <img src="{{ product.image.url }}" style="width:100%; height:300px; object-fit:cover;" alt="">
+                <h3 style="margin-top:10px;">{{ product.name }}</h3>
+                <p style="color: var(--gold);">${{ product.price }}</p>
             </div>
+            {% endfor %}
+        </div>
+    </section>
 
-            <div class="card-body">
-                <h4>{{ p.name }}</h4>
-
-                <p>{{ p.discription }}</p>
-
-                <p class="price">₦{{ p.price }}</p>
-
-                <div class="btn-group">
-                    <a href="{% url 'product_detail' p.id %}" class="btn view-btn">
-                        View
-                    </a>
-
-                    <a href="#" class="btn cart-btn">
-                        Add to Cart
-                    </a>
-                </div>
+    <!-- Feedback Display & Form -->
+    <section style="background: #0d0d0d; padding: 60px 8%;">
+        <h2 class="section-title">Client Love</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            {% for review in feedbacks %}
+            <div style="background: var(--gray); padding: 20px; border-top: 2px solid var(--gold);">
+                <p style="font-style: italic; font-size: 0.9rem;">"{{ review.message }}"</p>
+                <p style="color: var(--gold); margin-top: 10px;">— {{ review.user.username }}</p>
             </div>
-
+            {% endfor %}
         </div>
 
-        {% empty %}
-            <p style="text-align:center;color:#999;">No featured products yet</p>
-        {% endfor %}
-
-    </div>
-
-    <!-- FEEDBACK SECTION -->
-    <div class="feedback-section">
-
-        <div class="feedback-title">
-            <h3>Customer Feedback</h3>
-        </div>
-
-        {% for f in feedbacks %}
-        <div class="feedback-box">
-            <small>{{ f.user.username }}</small>
-            <p>{{ f.comment }}</p>
-        </div>
-        {% empty %}
-            <p style="text-align:center;color:#999;">No feedback yet</p>
-        {% endfor %}
-
-        <!-- FEEDBACK FORM -->
-        <div class="feedback-form">
-            <form method="POST" action="{% url 'submit_feedback' %}">
+        <!-- Small Feedback Form -->
+        <div style="max-width: 400px; margin: 50px auto; padding: 30px; border: 1px solid #333;">
+            <h4 style="margin-bottom: 20px; text-align: center;">Leave a Review</h4>
+            <form method="POST">
                 {% csrf_token %}
-
-                {{ form.as_p }}
-
-                <button type="submit">Send Feedback</button>
+                <style>
+                    .small-form input, .small-form textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: white; }
+                </style>
+                <div class="small-form">
+                    {{ form.rating }}
+                    {{ form.message }}
+                </div>
+                <button type="submit" class="cta-button" style="width: 100%; border: none; cursor: pointer;">Post</button>
             </form>
         </div>
-
-    </div>
-
-</section>
-
-{% endblock %}
+    </section>
+{% endblock content %}

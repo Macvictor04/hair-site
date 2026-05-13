@@ -51,12 +51,11 @@ def home(request):
 def list_product(request):
     query = request.GET.get('q')
     category = Category.objects.all()
+    product_list = Product.objects.all().order_by('-created_at')
     if query:
         product_list = Product.objects.filter(
-            Q(name__icontains=query)|Q(discription__icontains=query)
+            Q(name__icontains=query)|Q(description__icontains=query)
         )
-    else:
-        product_list = Product.objects.all()
     category_id = request.GET.get('category')
     if category_id:
         product_list = Product.objects.filter(categories_id=category_id)
