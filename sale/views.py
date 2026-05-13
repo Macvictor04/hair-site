@@ -77,8 +77,3 @@ def submit_feedback(request):
             feedback.user = request.user
             feedback.save()
             return redirect('home')
-   
-
-
-
-
