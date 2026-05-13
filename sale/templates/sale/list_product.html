@@ -1,70 +1,81 @@
 {% extends 'sale/base.html' %}
 
 {% block content %}
+<style>
+    /* SIMPLE CSS CLASSES */
+    .filter-link { text-decoration: none; font-size: 0.8rem; text-transform: uppercase; color: #888; transition: 0.3s; }
+    .filter-link.active { color: var(--gold); font-weight: bold; }
+    
+    .search-input { background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px 15px; width: 300px; }
+    
+    .product-card { background: var(--gray); padding: 15px; border: 1px solid #222; }
+    .product-img-container { width: 100%; height: 350px; overflow: hidden; margin-bottom: 15px; }
+    .product-img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .view-btn { display: block; margin-top: 15px; text-align: center; border: 1px solid #444; color: white; text-decoration: none; font-size: 0.7rem; padding: 8px; text-transform: uppercase; }
+    .pagination-link { color: var(--gold); text-decoration: none; padding: 5px 10px; border: 1px solid #333; }
+</style>
+
 <div class="container">
-    <!-- 1. Search & Filter Header -->
+    <!-- 1. Header & Search -->
     <header style="padding: 40px 0; text-align: center;">
-        <h1 style="font-family: 'Playfair Display'; font-size: 2.2rem; text-transform: uppercase; margin-bottom: 20px;">
+        <h1 style="font-family: 'Playfair Display'; margin-bottom: 20px;">
             {% if query %} Results for "{{ query }}" {% else %} All Collections {% endif %}
         </h1>
 
-        <!-- Search Bar -->
-        <form method="GET" action="{% url 'products' %}" style="margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
-            <input type="text" name="q" placeholder="Search hair type..." value="{{ query|default:'' }}" 
-                   style="background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px 15px; width: 300px;">
-            <button type="submit" class="cta-button" style="border: none; cursor: pointer;">Search</button>
+        <form method="GET" action="{% url 'products' %}" style="margin-bottom: 30px;">
+            <input type="text" name="q" placeholder="Search..." value="{{ query|default:'' }}" class="search-input">
+            <button type="submit" class="cta-button">Search</button>
         </form>
 
-        <!-- Category Pills -->
-        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 40px;">
-            <a href="{% url 'products' %}" 
-               style="text-decoration: none; color: {% if not request.GET.category %}var(--gold){% else %}#888{% endif %}; font-size: 0.8rem; text-transform: uppercase;">All</a>
+        <!-- Category Filter -->
+        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px;">
+            <a href="{% url 'products' %}" class="filter-link {% if not request.GET.category %}active{% endif %}">All</a>
+            
             {% for cat in category %}
             <a href="?category={{ cat.id }}" 
-               style="text-decoration: none; color: {% if request.GET.category == cat.id|stringformat:'i' %}var(--gold){% else %}#888{% endif %}; font-size: 0.8rem; text-transform: uppercase;">
+               class="filter-link {% if request.GET.category == cat.id|stringformat:'s' %}active{% endif %}">
                {{ cat.name }}
             </a>
             {% endfor %}
         </div>
     </header>
 
-    <!-- 2. The Product Grid (Constrained) -->
-    <section style="padding-bottom: 60px;">
-        <div class="product-grid">
-            {% for p in product %}
-            <div class="product-card" style="background: var(--gray); padding: 15px; border: 1px solid #222;">
-                <div style="width: 100%; height: 350px; overflow: hidden; margin-bottom: 15px;">
-                    <img src="{{ p.image.url }}" alt="{{ p.name }}" 
-                         style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <h3 style="font-size: 1rem; font-weight: 400; margin-bottom: 5px;">{{ p.name }}</h3>
-                <p class="price" style="color: var(--gold); font-weight: 600;">${{ p.price }}</p>
-                <a href="#" style="display: block; margin-top: 15px; text-align: center; border: 1px solid #444; color: white; text-decoration: none; font-size: 0.7rem; padding: 8px; text-transform: uppercase;">View Product</a>
+    <!-- 2. Product Grid -->
+    <section class="product-grid" style="padding-bottom: 60px;">
+        {% for p in product %}
+        <div class="product-card">
+            <div class="product-img-container">
+                <img src="{{ p.image.url }}" alt="{{ p.name }}" class="product-img">
             </div>
-            {% empty %}
-            <div style="grid-column: 1/-1; text-align: center; padding: 80px 0;">
-                <p>No products found matching your criteria.</p>
-                <a href="{% url 'products' %}" style="color: var(--gold);">Clear all filters</a>
-            </div>
-            {% endfor %}
+            <h3>{{ p.name }}</h3>
+            <p style="color: var(--gold);">${{ p.price }}</p>
+            <a href="{% url 'product_detail' p.id %}" class="view-btn">View Product</a>
         </div>
+        {% empty %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+            <p>No items found.</p>
+        </div>
+        {% endfor %}
     </section>
 
     <!-- 3. Pagination -->
     {% if product.has_other_pages %}
-    <nav style="display: flex; justify-content: center; gap: 10px; padding-bottom: 80px;">
-        {% if product.has_previous %}
-            <a href="?page={{ product.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-               style="color: var(--gold); text-decoration: none; padding: 5px 10px; border: 1px solid #333;">&laquo;</a>
-        {% endif %}
+     <nav style="display: flex; justify-content: center; gap: 10px; padding-bottom: 80px;">
+    
+     {% if product.has_previous %}
+        <a href="?page={{ product.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+           class="pagination-link">&laquo;</a>
+     {% endif %}
 
-        <span style="padding: 5px 10px; color: #888;">Page {{ product.number }} of {{ product.paginator.num_pages }}</span>
+     <span style="padding: 5px 10px;">Page {{ product.number }} of {{ product.paginator.num_pages }}</span>
 
-        {% if product.has_next %}
-            <a href="?page={{ product.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-               style="color: var(--gold); text-decoration: none; padding: 5px 10px; border: 1px solid #333;">&raquo;</a>
-        {% endif %}
-    </nav>
+     {% if product.has_next %}
+        <a href="?page={{ product.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
+           class="pagination-link">&raquo;</a>
+     {% endif %}
+
+     </nav>
     {% endif %}
 </div>
 {% endblock content %}
